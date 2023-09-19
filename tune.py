@@ -7,7 +7,7 @@ from sklearn import metrics
 import matplotlib.pyplot as plt
 from sklearn.model_selection import GridSearchCV, KFold, train_test_split
 
-data = pd.read_csv(r'data\data.csv')
+data = pd.read_csv(r'data\data_label.csv')
 num = data.shape[0]
 data = shuffle(data,n_samples=num)
 
@@ -23,8 +23,8 @@ train_y = train[target_column].values
 test_x = test[feature_columns].values
 test_y = test[target_column].values
 
-cv_params = {'learning_rate': [0.01, 0.05, 0.07, 0.1, 0.2]}
-other_params = {'learning_rate': 0.1, 'n_estimators': 100, 'max_depth': 5, 'min_child_weight': 3, 'seed': 0,
+cv_params = {'max_depth': [1,3,5,7], 'min_child_weight': [2,3,4,5]}
+other_params = {'learning_rate': 0.07, 'n_estimators': 100, 'max_depth': 5, 'min_child_weight': 3, 'seed': 0,
                     'subsample': 0.6, 'colsample_bytree': 0.7, 'gamma': 0.3, 'reg_alpha': 1, 'reg_lambda': 2}
 model = xgb.XGBClassifier(**other_params)
 optimized_GBM = GridSearchCV(estimator=model, param_grid=cv_params, scoring='roc_auc', cv=20, verbose=1, n_jobs=4)

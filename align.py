@@ -8,8 +8,10 @@ edstay = pd.read_csv(r'data\edstays.csv',sep=',',header='infer',usecols=[0,1,2,3
 triage = pd.read_csv(r'data\triage.csv',sep=',',header='infer',usecols=[0,1,2,3,4,5,6,7,8,9,10]).values[0::,0::]
 patient = pd.read_csv(r'data\patient.csv',sep=',',header='infer',usecols=[0,1,2]).values[0::,0::]
 
+sepsis_range = datetime.timedelta(days=1)
+
 num_sepsis = onset.shape[0]
-sepsis_24h = 0
+sepsis_in_range = 0
 headers = ['subject_id','hadm_id','in_time','sofa_time','sofa','ed_hour','age','gender','race','arrival_transport',
            'temperature','heartrate','resprate','o2sat','sbp','dbp','map','shock index','acuity','complaint']
 rows = []
@@ -30,7 +32,7 @@ for i in range(num_sepsis):
         patient_row = np.where(patient == subject_id)[0]
         triage_row = np.where(triage == ed_stay_id)[0]
 
-        if ((onset_time-ed_in_time).days<1):
+        if ((onset_time-ed_in_time)<sepsis_range):
             heartrate = triage[triage_row[0], 3]
             sbp = triage[triage_row[0], 6]
             dbp = triage[triage_row[0], 7]
@@ -42,8 +44,8 @@ for i in range(num_sepsis):
 
             rows.append((subject_id, hadm_id, ed_in_time.strftime('%Y-%m-%d %H:%M:%S'), onset_time.strftime('%Y-%m-%d %H:%M:%S'), sofa_score, ed_hour, patient[patient_row[0],2], edstay[ed_row[0],5], edstay[ed_row[0],6], edstay[ed_row[0],7], 
                          triage[triage_row[0], 2], heartrate, triage[triage_row[0], 4], triage[triage_row[0], 5], sbp, dbp, map, shock_index, triage[triage_row[0], 9], triage[triage_row[0], 10]))
-            sepsis_24h += 1
-    print(i)
+            sepsis_in_range += 1
+    print(i, sepsis_in_range)
 
 with open('data\sepsis_24h.csv','w',encoding='utf8',newline='') as f :
     writer = csv.writer(f)
